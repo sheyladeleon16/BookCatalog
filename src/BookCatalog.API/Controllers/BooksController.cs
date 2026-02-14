@@ -1,5 +1,6 @@
 ﻿using BookCatalog.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 
 namespace BookCatalog.API.Controllers
 {
@@ -59,7 +60,7 @@ namespace BookCatalog.API.Controllers
             existingBook.ISBN = book.ISBN;
             existingBook.Updated = DateTime.UtcNow;
 
-            return Ok(_book);
+            return (NoContent());
         }
 
         [HttpDelete("{id}")]
@@ -71,7 +72,7 @@ namespace BookCatalog.API.Controllers
                 return NotFound();
             }
             _book.Remove(existing);
-            return Ok(_book);
+            return (NoContent());
         }
 
     }
