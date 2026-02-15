@@ -1,4 +1,4 @@
-﻿using BookCatalog.API.Models;
+﻿using BookCatalog.API.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 
