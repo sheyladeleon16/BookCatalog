@@ -1,6 +1,8 @@
-﻿using BookCatalog.API.Models.Entities;
+﻿using BookCatalog.API.Models;
+using BookCatalog.API.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace BookCatalog.API.Controllers
 {
@@ -10,16 +12,23 @@ namespace BookCatalog.API.Controllers
     {
         private static readonly List<Keyword> _keyword = new List<Keyword>()
         {
-                new Keyword{ Id = 1, Tag = "Historical" },
+                new Keyword{ Id = 1, Tag = "Historical"},
                 new Keyword{ Id = 2, Tag = "Tecnology" },
                 new Keyword{ Id = 3, Tag = "Psicology" },
-                new Keyword{ Id = 4, Tag = "Filosofy" }
+                new Keyword{ Id = 4, Tag = "Filosofy"}
         };
 
         [HttpGet]
-        public ActionResult<List<Keyword>> GetKeyword()
+        public IActionResult GetKeyword()
         {
-            return(_keyword);
+            var keywordsDtos = _keyword.Select(keyword => new KeywordDto
+            {
+                Id = keyword.Id,
+                Tag = keyword.Tag
+
+
+            }).ToList();
+            return Ok(keywordsDtos);
         }
 
         [HttpGet("{id}")]
@@ -30,32 +39,41 @@ namespace BookCatalog.API.Controllers
             {
                 return NotFound();
             }
-            return Ok(keyword);
+            var result = new KeywordDto
+            {
+                Id = keyword.Id,
+                Tag = keyword.Tag
+                
+            };
+            return Ok(result);
         }
 
         [HttpPost]
-        public IActionResult Create(Keyword keyword)
+        public IActionResult Create(KeywordDto keywordRequest)
         {
-            if (string.IsNullOrWhiteSpace(keyword.Tag))
+            if (string.IsNullOrWhiteSpace(keywordRequest.Tag))
             {
                 return BadRequest("Tag is required.");
             }
             int newId = _keyword.Any() ? _keyword.Max(k => k.Id) + 1 : 1;
-            keyword.Id = newId;
-
+            var keyword = new Keyword
+            {
+                Id = newId,
+                Tag = keywordRequest.Tag,
+            };
             _keyword.Add(keyword);
-            return Ok(_keyword);
+            return Ok(new { Id = keyword.Id });
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Keyword keyword)
+        public IActionResult Update(int id, KeywordDto keywordRequest)
         {
             var existingkeyword = _keyword.FirstOrDefault(k => k.Id == id);
             if (existingkeyword == null)
             {
                 return NotFound();
             }
-            existingkeyword.Tag = keyword.Tag;
+            existingkeyword.Tag = keywordRequest.Tag;
 
             return (NoContent());
         }
