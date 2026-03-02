@@ -11,16 +11,24 @@ namespace BookCatalog.API.Controllers
     {
         private static readonly List<Book> _book = new List<Book>()
         {
-                new Book{ Id = 1, Title = "The Great Gatsby", Author = "F. Scott Fitzgerald", PublicationDate = new DateTime(1925, 4, 10), ISBN = "978-0743273565", KeywordIds = [1] },
-                new Book{ Id = 2, Title = "To Kill a Mockingbird", Author = "Harper Lee", PublicationDate = new DateTime(1960, 7, 11), ISBN = "978-0061120084" },
-                new Book { Id = 3, Title = "1984", Author = "George Orwell", PublicationDate = new DateTime(1949, 6, 8), ISBN = "978-0451524935" }
+                new Book{ Id = 1, Title = "The Great Gatsby", Author = "F. Scott Fitzgerald", PublicationDate = new DateTime(1925, 4, 10), ISBN = "978-0743273565"},
+                new Book{ Id = 2, Title = "To Kill a Mockingbird", Author = "Harper Lee", PublicationDate = new DateTime(1960, 7, 11), ISBN = "978-0061120084"},
+                new Book{ Id = 3, Title = "1984", Author = "George Orwell", PublicationDate = new DateTime(1949, 6, 8), ISBN = "978-0451524935" }
         };
 
         [HttpGet]
-        public ActionResult<List<Book>> GetBooks()
+        public IActionResult GetBooks()
         {
-            
-            return (_book);
+            var booksDtos = _book.Select(book => new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                PublicationDate = book.PublicationDate,
+                ISBN = book.ISBN,
+                
+            }).ToList();
+            return Ok(booksDtos);
         }
 
         [HttpGet("{id}")]
@@ -31,50 +39,52 @@ namespace BookCatalog.API.Controllers
             {
                 return NotFound();
             }
-            var result = _book.Select(b =>
+            var result = new BookDto
             {
-                List<string> list = b.Keywords.Select(k => k.Tag).ToList();
-                return new Models.BookDto
-                {
-                    Id = b.Id,
-                    Title = b.Title,
-                    Author = b.Author,
-                    PublicationDate = b.PublicationDate,
-                    ISBN = b.ISBN,
+                    Id = book.Id,
+                    Title = book.Title,
+                    Author = book.Author,
+                    PublicationDate = book.PublicationDate,
+                    ISBN = book.ISBN,
                     
-                };
-            }).ToList();
-            return Ok(book);
+            };
+            return Ok(result);
         }
 
         [HttpPost]
-        public IActionResult Create(Book book)
+        public IActionResult Create(BookDto bookRequest)
         {
-            if (string.IsNullOrWhiteSpace(book.Title))
+            if (string.IsNullOrWhiteSpace(bookRequest.Title))
             {
                 return BadRequest("Title is required.");
             }
             int newId = _book.Any() ? _book.Max(b => b.Id) + 1 : 1;
-            book.Id = newId;
+            var book = new Book 
+            {
+                Id = newId,
+                Title = bookRequest.Title,
+                Author = bookRequest.Author,
+                PublicationDate = bookRequest.PublicationDate,
+                ISBN = bookRequest.ISBN,
+            };
 
             _book.Add(book);
-            return Ok(_book);
+            return Ok(new {Id = book.Id});
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Book book)
+        public IActionResult Update(int id, BookDto bookRequest)
         {
             var existingBook = _book.FirstOrDefault(b => b.Id == id);
             if (existingBook == null)
             {
                 return NotFound();
             }
-            existingBook.Title = book.Title;
-            existingBook.Author = book.Author;
-            existingBook.PublicationDate = book.PublicationDate;
-            existingBook.ISBN = book.ISBN;
-            existingBook.Updated = DateTime.UtcNow;
-
+            existingBook.Title = bookRequest.Title;
+            existingBook.Author = bookRequest.Author;
+            existingBook.PublicationDate = bookRequest.PublicationDate;
+            existingBook.ISBN = bookRequest.ISBN;
+   
             return (NoContent());
         }
 

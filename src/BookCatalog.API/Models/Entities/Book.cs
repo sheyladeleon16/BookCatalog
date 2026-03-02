@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookCatalog.API.Models.Entities
 {
@@ -13,8 +15,6 @@ namespace BookCatalog.API.Models.Entities
         public DateTime PublicationDate { get; set; }
         [StringLength(20)]
         public string ISBN { get; set; } = string.Empty;
-
-        public List<Keyword> Keywords { get; set; };
 
         public DateTime Created { get; set; } = DateTime.UtcNow;
         public DateTime Updated { get; set; } = DateTime.UtcNow; 
