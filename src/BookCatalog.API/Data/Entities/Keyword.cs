@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BookCatalog.API.Models.Entities
+namespace BookCatalog.API.Data.Entities
 {
     public class Keyword
     {

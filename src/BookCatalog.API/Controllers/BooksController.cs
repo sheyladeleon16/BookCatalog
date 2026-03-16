@@ -1,7 +1,9 @@
-﻿using BookCatalog.API.Models;
-using BookCatalog.API.Models.Entities;
+﻿using BookCatalog.API.Data;
+using BookCatalog.API.Data.Entities;
+using BookCatalog.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Identity.Client;
 
 namespace BookCatalog.API.Controllers
 {
@@ -9,17 +11,16 @@ namespace BookCatalog.API.Controllers
     [Route("api/[controller]")]
     public class BooksController : ControllerBase
     {
-        private static readonly List<Book> _book = new List<Book>()
+        private readonly ApplicationContext _context;
+        public BooksController(ApplicationContext context) 
         {
-                new Book{ Id = 1, Title = "The Great Gatsby", Author = "F. Scott Fitzgerald", PublicationDate = new DateTime(1925, 4, 10), ISBN = "978-0743273565"},
-                new Book{ Id = 2, Title = "To Kill a Mockingbird", Author = "Harper Lee", PublicationDate = new DateTime(1960, 7, 11), ISBN = "978-0061120084"},
-                new Book{ Id = 3, Title = "1984", Author = "George Orwell", PublicationDate = new DateTime(1949, 6, 8), ISBN = "978-0451524935" }
-        };
-
+            _context = context;
+        }
+        
         [HttpGet]
         public IActionResult GetBooks()
         {
-            var booksDtos = _book.Select(book => new BookDto
+            var booksDtos = _context.Books.Select(book => new BookDto
             {
                 Id = book.Id,
                 Title = book.Title,
@@ -34,7 +35,7 @@ namespace BookCatalog.API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var book = _book.FirstOrDefault(b => b.Id == id);
+            var book = _context.Books.FirstOrDefault(b => b.Id == id);
             if (book == null)
             {
                 return NotFound();
@@ -58,24 +59,25 @@ namespace BookCatalog.API.Controllers
             {
                 return BadRequest("Title is required.");
             }
-            int newId = _book.Any() ? _book.Max(b => b.Id) + 1 : 1;
+         
             var book = new Book 
             {
-                Id = newId,
                 Title = bookRequest.Title,
                 Author = bookRequest.Author,
                 PublicationDate = bookRequest.PublicationDate,
                 ISBN = bookRequest.ISBN,
             };
 
-            _book.Add(book);
+            _context.Add(book);
+            _context.SaveChanges();
+
             return Ok(new {Id = book.Id});
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, BookDto bookRequest)
         {
-            var existingBook = _book.FirstOrDefault(b => b.Id == id);
+            var existingBook = _context.Books.FirstOrDefault(b => b.Id == id);
             if (existingBook == null)
             {
                 return NotFound();
@@ -84,6 +86,9 @@ namespace BookCatalog.API.Controllers
             existingBook.Author = bookRequest.Author;
             existingBook.PublicationDate = bookRequest.PublicationDate;
             existingBook.ISBN = bookRequest.ISBN;
+
+            _context.Update(existingBook);
+            _context.SaveChanges();
    
             return (NoContent());
         }
@@ -91,12 +96,13 @@ namespace BookCatalog.API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existing = _book.FirstOrDefault(b => b.Id == id);
+            var existing = _context.Books.FirstOrDefault(b => b.Id == id);
             if (existing == null)
             {
                 return NotFound();
             }
-            _book.Remove(existing);
+            _context.Remove(existing);
+            _context.SaveChanges();
             return (NoContent());
         }
 
