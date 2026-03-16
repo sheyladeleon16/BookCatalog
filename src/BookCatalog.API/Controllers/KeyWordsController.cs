@@ -1,5 +1,5 @@
-﻿using BookCatalog.API.Models;
-using BookCatalog.API.Models.Entities;
+﻿using BookCatalog.API.Data.Entities;
+using BookCatalog.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
