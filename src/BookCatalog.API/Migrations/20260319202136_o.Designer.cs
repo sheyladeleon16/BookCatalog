@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookCatalog.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20260315194146_Initial migration")]
-    partial class Initialmigration
+    [Migration("20260319202136_o")]
+    partial class o
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace BookCatalog.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BookCatalog.API.Models.Entities.Book", b =>
+            modelBuilder.Entity("BookCatalog.API.Data.Entities.Book", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -37,9 +37,6 @@ namespace BookCatalog.API.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("ISBN")
                         .IsRequired()
@@ -54,15 +51,12 @@ namespace BookCatalog.API.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.ToTable("Books");
                 });
 
-            modelBuilder.Entity("BookCatalog.API.Models.Entities.Keyword", b =>
+            modelBuilder.Entity("BookCatalog.API.Data.Entities.Keyword", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -73,14 +67,30 @@ namespace BookCatalog.API.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Tag")
+                    b.Property<string>("Words")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BookId");
+
                     b.ToTable("Keywords");
+                });
+
+            modelBuilder.Entity("BookCatalog.API.Data.Entities.Keyword", b =>
+                {
+                    b.HasOne("BookCatalog.API.Data.Entities.Book", null)
+                        .WithMany("Keyword")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BookCatalog.API.Data.Entities.Book", b =>
+                {
+                    b.Navigation("Keyword");
                 });
 #pragma warning restore 612, 618
         }

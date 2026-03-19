@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BookCatalog.API.Models
 {
@@ -13,5 +12,6 @@ namespace BookCatalog.API.Models
         [StringLength(20)]
         public string ISBN { get; set; } = string.Empty;
 
+        
     }
 }

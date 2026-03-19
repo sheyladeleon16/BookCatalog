@@ -7,8 +7,7 @@ namespace BookCatalog.API.Data.Entities
         [Key]
         public int Id { get; set; }
         [StringLength(100)]
-        public string Tag { get; set; } = string.Empty;
+        public string Words { get; set; } = string.Empty;
         public int BookId { get; set; }
-
     }
 }

@@ -12,10 +12,10 @@ namespace BookCatalog.API.Controllers
     {
         private static readonly List<Keyword> _keyword = new List<Keyword>()
         {
-                new Keyword{ Id = 1, Tag = "Historical"},
-                new Keyword{ Id = 2, Tag = "Tecnology" },
-                new Keyword{ Id = 3, Tag = "Psicology" },
-                new Keyword{ Id = 4, Tag = "Filosofy"}
+                new Keyword{ Id = 1, Words = "Historical"},
+                new Keyword{ Id = 2, Words = "Tecnology" },
+                new Keyword{ Id = 3, Words = "Psicology" },
+                new Keyword{ Id = 4, Words = "Filosofy"}
         };
 
         [HttpGet]
@@ -24,7 +24,7 @@ namespace BookCatalog.API.Controllers
             var keywordsDtos = _keyword.Select(keyword => new KeywordDto
             {
                 Id = keyword.Id,
-                Tag = keyword.Tag
+                Words = keyword.Words
 
 
             }).ToList();
@@ -42,8 +42,8 @@ namespace BookCatalog.API.Controllers
             var result = new KeywordDto
             {
                 Id = keyword.Id,
-                Tag = keyword.Tag
-                
+                Words = keyword.Words
+
             };
             return Ok(result);
         }
@@ -51,15 +51,15 @@ namespace BookCatalog.API.Controllers
         [HttpPost]
         public IActionResult Create(KeywordDto keywordRequest)
         {
-            if (string.IsNullOrWhiteSpace(keywordRequest.Tag))
+            if (string.IsNullOrWhiteSpace(keywordRequest.Words))
             {
-                return BadRequest("Tag is required.");
+                return BadRequest("Key is required.");
             }
             int newId = _keyword.Any() ? _keyword.Max(k => k.Id) + 1 : 1;
             var keyword = new Keyword
             {
                 Id = newId,
-                Tag = keywordRequest.Tag,
+                Words = keywordRequest.Words,
             };
             _keyword.Add(keyword);
             return Ok(new { Id = keyword.Id });
@@ -73,7 +73,7 @@ namespace BookCatalog.API.Controllers
             {
                 return NotFound();
             }
-            existingkeyword.Tag = keywordRequest.Tag;
+            existingkeyword.Words = keywordRequest.Words;
 
             return (NoContent());
         }
