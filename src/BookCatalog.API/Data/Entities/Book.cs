@@ -16,8 +16,10 @@ namespace BookCatalog.API.Data.Entities
         [StringLength(20)]
         public string ISBN { get; set; } = string.Empty;
 
-        public DateTime Created { get; set; } = DateTime.UtcNow;
-        public DateTime Updated { get; set; } = DateTime.UtcNow; 
+        public List<Keyword> Keyword { get; set; } = new();
+
+
+     
 
     }
 }

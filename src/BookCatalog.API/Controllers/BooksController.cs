@@ -1,9 +1,11 @@
 ﻿using BookCatalog.API.Data;
 using BookCatalog.API.Data.Entities;
 using BookCatalog.API.Models;
+using BookCatalog.API.Models.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Identity.Client;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace BookCatalog.API.Controllers
 {
@@ -30,6 +32,26 @@ namespace BookCatalog.API.Controllers
                 
             }).ToList();
             return Ok(booksDtos);
+        }
+
+        [HttpGet("with-keywords")]
+        public IActionResult GetAll()
+        {
+            var booksWithKeywords = _context.Books
+            .Select(b => new BooksWithkeywords()
+            {
+                Id = b.Id,
+                Title = b.Title,
+                Author = b.Author,
+                PublicationDate = b.PublicationDate,
+                ISBN = b.ISBN,
+                Keywords = b.Keyword.Select(k => new KeywordDto
+                {
+                    Id = k.Id,
+                    Words = k.Words
+                }).ToList()
+            }).ToList();
+            return Ok(booksWithKeywords);
         }
 
         [HttpGet("{id}")]
