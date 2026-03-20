@@ -1,5 +1,7 @@
 using BookCatalog.API.Data;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using BookCatalog.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +13,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddAutoMapper(cfg =>
+{ 
+    cfg.AddProfile<MappingProfile>();
+}, typeof(Program).Assembly);
 
 var app = builder.Build();
 
