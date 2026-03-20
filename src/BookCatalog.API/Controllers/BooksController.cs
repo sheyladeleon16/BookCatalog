@@ -1,4 +1,5 @@
-﻿using BookCatalog.API.Data;
+﻿using AutoMapper;
+using BookCatalog.API.Data;
 using BookCatalog.API.Data.Entities;
 using BookCatalog.API.Models;
 using BookCatalog.API.Models.Dtos;
@@ -14,24 +15,21 @@ namespace BookCatalog.API.Controllers
     public class BooksController : ControllerBase
     {
         private readonly ApplicationContext _context;
-        public BooksController(ApplicationContext context) 
+        private readonly IMapper _mapper;   
+        public BooksController(ApplicationContext context, IMapper mapper) 
         {
             _context = context;
+            _mapper = mapper;
+
         }
         
         [HttpGet]
         public IActionResult GetBooks()
         {
-            var booksDtos = _context.Books.Select(book => new BookDto
-            {
-                Id = book.Id,
-                Title = book.Title,
-                Author = book.Author,
-                PublicationDate = book.PublicationDate,
-                ISBN = book.ISBN,
-                
-            }).ToList();
-            return Ok(booksDtos);
+            var books = _context.Books.ToList();
+            var response = _mapper.Map<List<BookDto>>(books);
+           
+            return Ok(response);
         }
 
         [HttpGet("with-keywords")]
@@ -61,15 +59,9 @@ namespace BookCatalog.API.Controllers
             {
                 return NotFound();
             }
-            var result = new BookDto
-            {
-                    Id = book.Id,
-                    Title = book.Title,
-                    Author = book.Author,
-                    PublicationDate = book.PublicationDate,
-                    ISBN = book.ISBN,
-                    
-            };
+       
+            var result = _mapper.Map<BookDto>(book);
+
             return Ok(result);
         }
 
@@ -80,15 +72,8 @@ namespace BookCatalog.API.Controllers
             {
                 return BadRequest("Title is required.");
             }
-         
-            var book = new Book 
-            {
-                Title = bookRequest.Title,
-                Author = bookRequest.Author,
-                PublicationDate = bookRequest.PublicationDate,
-                ISBN = bookRequest.ISBN,
-            };
-
+       
+            var book = _mapper.Map<Book>(bookRequest);
             _context.Add(book);
             _context.SaveChanges();
 
