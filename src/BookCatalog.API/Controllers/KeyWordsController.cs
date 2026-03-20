@@ -1,6 +1,8 @@
-﻿using BookCatalog.API.Data.Entities;
+﻿using BookCatalog.API.Data;
+using BookCatalog.API.Data.Entities;
 using BookCatalog.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
@@ -10,22 +12,21 @@ namespace BookCatalog.API.Controllers
     [Route("api/[controller]")]
     public class KeyWordsController: ControllerBase
     {
-        private static readonly List<Keyword> _keyword = new List<Keyword>()
+        private readonly ApplicationContext _Context;
+
+        public KeyWordsController(ApplicationContext context)
         {
-                new Keyword{ Id = 1, Words = "Historical"},
-                new Keyword{ Id = 2, Words = "Tecnology" },
-                new Keyword{ Id = 3, Words = "Psicology" },
-                new Keyword{ Id = 4, Words = "Filosofy"}
-        };
+            _Context = context;
+        }
 
         [HttpGet]
         public IActionResult GetKeyword()
         {
-            var keywordsDtos = _keyword.Select(keyword => new KeywordDto
+            var keywordsDtos = _Context.Keywords.Select(keyword => new KeywordDto
             {
                 Id = keyword.Id,
-                Words = keyword.Words
-
+                Words = keyword.Words,
+          
 
             }).ToList();
             return Ok(keywordsDtos);
@@ -34,7 +35,7 @@ namespace BookCatalog.API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var keyword = _keyword.FirstOrDefault(k => k.Id == id);
+            var keyword = _Context.Keywords.FirstOrDefault(k => k.Id == id);
             if (keyword == null)
             {
                 return NotFound();
@@ -53,27 +54,31 @@ namespace BookCatalog.API.Controllers
         {
             if (string.IsNullOrWhiteSpace(keywordRequest.Words))
             {
-                return BadRequest("Key is required.");
+                return BadRequest("Word is required.");
             }
-            int newId = _keyword.Any() ? _keyword.Max(k => k.Id) + 1 : 1;
+            
             var keyword = new Keyword
             {
-                Id = newId,
                 Words = keywordRequest.Words,
+                BookId = keywordRequest.BookId
             };
-            _keyword.Add(keyword);
+            _Context.Add(keyword);
+            _Context.SaveChanges(); 
+
             return Ok(new { Id = keyword.Id });
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, KeywordDto keywordRequest)
         {
-            var existingkeyword = _keyword.FirstOrDefault(k => k.Id == id);
+            var existingkeyword = _Context.Keywords.FirstOrDefault(k => k.Id == id);
             if (existingkeyword == null)
             {
                 return NotFound();
             }
             existingkeyword.Words = keywordRequest.Words;
+            _Context.Add(existingkeyword);
+            _Context.SaveChanges();
 
             return (NoContent());
         }
@@ -81,12 +86,13 @@ namespace BookCatalog.API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existing = _keyword.FirstOrDefault(b => b.Id == id);
+            var existing = _Context.Keywords.FirstOrDefault(b => b.Id == id);
             if (existing == null)
             {
                 return NotFound();
             }
-            _keyword.Remove(existing);
+            _Context.Remove(existing);
+            _Context.SaveChanges();
             return (NoContent());
         }
 

@@ -44,7 +44,6 @@ namespace BookCatalog.API.Controllers
                 Title = b.Title,
                 Author = b.Author,
                 PublicationDate = b.PublicationDate,
-                ISBN = b.ISBN,
                 Keywords = b.Keyword.Select(k => new KeywordDto
                 {
                     Id = k.Id,
