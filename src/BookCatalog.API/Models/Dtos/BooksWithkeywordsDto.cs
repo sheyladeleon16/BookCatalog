@@ -10,7 +10,7 @@ namespace BookCatalog.API.Models.Dtos
         public string Author { get; set; } = string.Empty;
         public DateTime PublicationDate { get; set; }
         [StringLength(20)]
-        public string ISBN { get; set; } = string.Empty;
+       
         public List<KeywordDto> Keywords { get; set; } = new();
 
     }

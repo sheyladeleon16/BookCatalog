@@ -12,6 +12,6 @@ namespace BookCatalog.API.Models
         [StringLength(20)]
         public string ISBN { get; set; } = string.Empty;
 
-        
+
     }
 }
