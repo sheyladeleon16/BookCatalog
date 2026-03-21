@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="../BookCatalog.Domain/BookCatalog.Domain.csproj" Id="d8264a8c-81e5-44ba-aae4-6d3c19b6f08e" />
+  <Project Path="../BookCatalog.Infrastructure/BookCatalog.Infrastructure.csproj" Id="12e02fb1-348e-4112-80a3-72013f013022" />
+  <Project Path="../BookCatalog.Persistence/BookCatalog.Persistence.csproj" Id="7d45f300-512a-4b37-a1fa-468953e7e912" />
   <Project Path="BookCatalog.API.csproj" />
 </Solution>

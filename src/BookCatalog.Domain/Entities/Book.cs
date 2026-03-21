@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace BookCatalog.API.Data.Entities
+namespace BookCatalog.Domain.Entities
 {
     public class Book
     {

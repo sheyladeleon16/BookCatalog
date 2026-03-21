@@ -1,6 +1,7 @@
-﻿using BookCatalog.API.Data;
-using BookCatalog.API.Data.Entities;
+﻿
 using BookCatalog.API.Models;
+using BookCatalog.Domain.Entities;
+using BookCatalog.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
