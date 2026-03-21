@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
-using BookCatalog.API.Data;
-using BookCatalog.API.Data.Entities;
 using BookCatalog.API.Models;
 using BookCatalog.API.Models.Dtos;
+using BookCatalog.Domain.Entities;
+using BookCatalog.Infrastructure.Repositories;
+using BookCatalog.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Identity.Client;
@@ -14,19 +15,21 @@ namespace BookCatalog.API.Controllers
     [Route("api/[controller]")]
     public class BooksController : ControllerBase
     {
-        private readonly ApplicationContext _context;
-        private readonly IMapper _mapper;   
-        public BooksController(ApplicationContext context, IMapper mapper) 
-        {
-            _context = context;
-            _mapper = mapper;
+        //private readonly ApplicationContext _context;
+        private readonly IMapper _mapper;
+        private readonly UnitOfWork _unitOfWork;
 
+        public BooksController(ApplicationContext context, IMapper mapper, UnitOfWork unitOfWork) 
+        {
+            //_context = context;
+            _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
-        
+
         [HttpGet]
         public IActionResult GetBooks()
         {
-            var books = _context.Books.ToList();
+            var books = _unitOfWork.BookRepository.GetAllBooks();
             var response = _mapper.Map<List<BookDto>>(books);
            
             return Ok(response);
@@ -35,7 +38,7 @@ namespace BookCatalog.API.Controllers
         [HttpGet("with-keywords")]
         public IActionResult GetAll()
         {
-            var booksWithKeywords = _context.Books
+            var booksWithKeywords = _unitOfWork.BookRepository.GetBooksWithKeywords()
             .Select(b => new BooksWithkeywords()
             {
                 Id = b.Id,
@@ -54,7 +57,7 @@ namespace BookCatalog.API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var book = _context.Books.FirstOrDefault(b => b.Id == id);
+            var book = _unitOfWork.BookRepository.GetBookById(id);
             if (book == null)
             {
                 return NotFound();
@@ -74,8 +77,10 @@ namespace BookCatalog.API.Controllers
             }
        
             var book = _mapper.Map<Book>(bookRequest);
-            _context.Add(book);
-            _context.SaveChanges();
+            _unitOfWork.BeginTransaction();
+            _unitOfWork.BookRepository.AddBook(book);
+            _unitOfWork.Complete();
+            _unitOfWork.Commit();
 
             return Ok(new {Id = book.Id});
         }
@@ -83,7 +88,7 @@ namespace BookCatalog.API.Controllers
         [HttpPut("{id}")]
         public IActionResult Update(int id, BookDto bookRequest)
         {
-            var existingBook = _context.Books.FirstOrDefault(b => b.Id == id);
+            var existingBook = _unitOfWork.BookRepository.GetBookById(id);
             if (existingBook == null)
             {
                 return NotFound();
@@ -93,22 +98,21 @@ namespace BookCatalog.API.Controllers
             existingBook.PublicationDate = bookRequest.PublicationDate;
             existingBook.ISBN = bookRequest.ISBN;
 
-            _context.Update(existingBook);
-            _context.SaveChanges();
-   
+            _unitOfWork.BookRepository.UpdateBook(existingBook);
+            _unitOfWork.Complete();
             return (NoContent());
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existing = _context.Books.FirstOrDefault(b => b.Id == id);
+            var existing = _unitOfWork.BookRepository.GetBookById(id);
             if (existing == null)
             {
                 return NotFound();
             }
-            _context.Remove(existing);
-            _context.SaveChanges();
+            _unitOfWork.BookRepository.DeleteBook(existing);
+            _unitOfWork.Complete();
             return (NoContent());
         }
 

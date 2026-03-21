@@ -1,7 +1,8 @@
-using BookCatalog.API.Data;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using BookCatalog.API.Models;
+using BookCatalog.Persistence;
+using BookCatalog.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,12 +14,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+        //,b => b.MigrationsAssembly("BookCatalog.Persistence")
+    ));
 
-builder.Services.AddAutoMapper(cfg =>
-{ 
-    cfg.AddProfile<MappingProfile>();
-}, typeof(Program).Assembly);
+// registra solo el ensamblado donde está MappingProfile
+builder.Services.AddAutoMapper(new[] { typeof(BookCatalog.API.Models.MappingProfile).Assembly });
+
+builder.Services.AddTransient<BookRepository>();
+builder.Services.AddTransient<KeywordRepository>();
+builder.Services.AddTransient<UnitOfWork>();    
 
 var app = builder.Build();
 

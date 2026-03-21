@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using BookCatalog.API.Data.Entities;
+using BookCatalog.Domain.Entities;
 
 namespace BookCatalog.API.Models
 {
