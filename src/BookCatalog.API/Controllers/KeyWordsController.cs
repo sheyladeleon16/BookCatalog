@@ -1,6 +1,7 @@
 ﻿
 using BookCatalog.API.Models;
 using BookCatalog.Domain.Entities;
+using BookCatalog.Infrastructure.Repositories;
 using BookCatalog.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,30 +14,30 @@ namespace BookCatalog.API.Controllers
     [Route("api/[controller]")]
     public class KeyWordsController: ControllerBase
     {
-        private readonly ApplicationContext _Context;
+        private readonly UnitOfWork _unitOfWork;
 
-        public KeyWordsController(ApplicationContext context)
+        public KeyWordsController(UnitOfWork unitOfWork)
         {
-            _Context = context;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public IActionResult GetKeyword()
         {
-            var keywordsDtos = _Context.Keywords.Select(keyword => new KeywordDto
+            var keywordsDtos = _unitOfWork.KeywordRepository.GetAllKeywords();
+            var result = keywordsDtos.Select(k => new KeywordDto
             {
-                Id = keyword.Id,
-                Words = keyword.Words,
-          
-
+                Id = k.Id,
+                Words = k.Words,
+                BookId = k.BookId
             }).ToList();
-            return Ok(keywordsDtos);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var keyword = _Context.Keywords.FirstOrDefault(k => k.Id == id);
+            var keyword = _unitOfWork.KeywordRepository.GetKeywordById(id);
             if (keyword == null)
             {
                 return NotFound();
@@ -63,8 +64,10 @@ namespace BookCatalog.API.Controllers
                 Words = keywordRequest.Words,
                 BookId = keywordRequest.BookId
             };
-            _Context.Add(keyword);
-            _Context.SaveChanges(); 
+            _unitOfWork.BeginTransaction();
+            _unitOfWork.KeywordRepository.AddKeyword(keyword); 
+            _unitOfWork.Complete();
+            _unitOfWork.Commit();   
 
             return Ok(new { Id = keyword.Id });
         }
@@ -72,28 +75,27 @@ namespace BookCatalog.API.Controllers
         [HttpPut("{id}")]
         public IActionResult Update(int id, KeywordDto keywordRequest)
         {
-            var existingkeyword = _Context.Keywords.FirstOrDefault(k => k.Id == id);
+            var existingkeyword = _unitOfWork.KeywordRepository.GetKeywordById(id);
             if (existingkeyword == null)
             {
                 return NotFound();
             }
             existingkeyword.Words = keywordRequest.Words;
-            _Context.Add(existingkeyword);
-            _Context.SaveChanges();
-
+            _unitOfWork.KeywordRepository.UpdateKeyword(existingkeyword);   
+            _unitOfWork.Complete();
             return (NoContent());
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existing = _Context.Keywords.FirstOrDefault(b => b.Id == id);
+            var existing = _unitOfWork.KeywordRepository.GetKeywordById(id);
             if (existing == null)
             {
                 return NotFound();
             }
-            _Context.Remove(existing);
-            _Context.SaveChanges();
+            _unitOfWork.KeywordRepository.DeleteKeyword(existing);
+            _unitOfWork.Complete(); 
             return (NoContent());
         }
 
