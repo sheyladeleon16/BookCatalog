@@ -6,7 +6,7 @@ using BookCatalog.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
-namespace BookCatalog.API.Controllers
+namespace BookCatalog.Application.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

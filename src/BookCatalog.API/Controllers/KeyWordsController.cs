@@ -1,5 +1,6 @@
 ﻿
-using BookCatalog.API.Models;
+using BookCatalog.Application.Dtos;
+using BookCatalog.Application.Models;
 using BookCatalog.Domain.Entities;
 using BookCatalog.Infrastructure.Repositories;
 using BookCatalog.Persistence;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
-namespace BookCatalog.API.Controllers
+namespace BookCatalog.Application.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
