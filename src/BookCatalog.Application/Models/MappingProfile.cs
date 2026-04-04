@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
+using BookCatalog.Application.Dtos;
 using BookCatalog.Domain.Entities;
 
-namespace BookCatalog.API.Models
+namespace BookCatalog.Application.Models.Dtos
 {
     public class MappingProfile : Profile
     {

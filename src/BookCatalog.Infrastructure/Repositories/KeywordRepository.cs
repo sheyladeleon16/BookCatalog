@@ -17,13 +17,9 @@ namespace BookCatalog.Infrastructure.Repositories
             _context = context;
         }
 
-        public Keyword GetKeywordById(int Id)
+        public Keyword? GetKeywordById(int Id)
         {
             return _context.Keywords.Find(Id);
-        }
-        public Keyword GetKeywordById(String word)
-        {
-            return _context.Keywords.FirstOrDefault(w => w.Words.ToLower().Contains(word.ToLower()));
         }
 
         public List<Keyword> GetAllKeywords()
@@ -33,21 +29,19 @@ namespace BookCatalog.Infrastructure.Repositories
         public Keyword AddKeyword(Keyword book)
         {
             _context.Keywords.Add(book);
-            _context.SaveChanges();
             return book;
         }
         public void UpdateKeyword(Keyword book)
         {
             _context.Keywords.Add(book);
-            _context.SaveChanges();
-
         }
         public void DeleteKeyword(Keyword book)
         {
-            _context.Keywords.Remove(book);
-            _context.SaveChanges();
+            _context.Keywords.Remove(book); 
         }
-
-
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }   
     }
 }

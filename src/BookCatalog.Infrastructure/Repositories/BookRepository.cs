@@ -35,19 +35,16 @@ namespace BookCatalog.Infrastructure.Repositories
         public Book AddBook(Book book)
         {
             _context.Books.Add(book);
-            //_context.SaveChanges();
             return book;
         }
         public void UpdateBook(Book book)
         {
             _context.Books.Add(book);
-            //_context.SaveChanges();
 
         }
         public void DeleteBook(Book book)
         {
             _context.Books.Remove(book);
-            //_context.SaveChanges();
         }
 
         public void SaveChanges()

@@ -18,9 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BookCatalog.Domain\BookCatalog.Domain.csproj" />
-	  <ProjectReference Include="..\BookCatalog.API\BookCatalog.API.csproj" />
-	  
+    <ProjectReference Include="..\BookCatalog.Domain\BookCatalog.Domain.csproj" />	  
 	  
   </ItemGroup>
 
